@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Pixel Physics</title>
+<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+	<div class='heading'>
+		<span id='heading-text'>Pixel Physics</span>
+	</div>
+	<div class='content'>
+		<div class='canvas-container'>
+			<canvas id='canvas'></canvas>
+		</div>
+		<div class='control-bar'>
+			<div class='control-item' id='step-back-button'>
+				<img id='step-back-image' class='control-bar-image' src='step-back-icon.png'>
+			</div>
+			<div class='control-item' id='play-button'>
+				<img id='play-image' class='control-bar-image' src='play-icon.png'>
+			</div>
+			<div class='control-item control-item-underlined' id='pause-button'>
+				<img id='pause-image' class='control-bar-image' src='pause-icon.png'>
+			</div>
+			<div class='control-item' id='step-forward-button'>
+				<img id='step-forward-image' class='control-bar-image' src='step-forward-icon.png'>
+			</div>
+			<div class='control-item' id='select-button'>
+				<img id='select-image' class='control-bar-image' src='select-icon.jpg'>
+			</div>
+			<div class='control-item' id='settings-button'>
+				<img id='settings-image' class='control-bar-image' src='settings-icon.png'>
+			</div>
+			<div class='control-item' id='add-type-button'>
+				<img id='add-type-image' class='control-bar-image' src='plus icon.png'>
+			</div>
+		</div>
+		<div id='settings-wrapper' class='gone menu-wrapper'>
+			<div id='settings-menu' class='menu'>
+				<div id='menu-tabs'></div>
+				<div id='menu-content'>
+					<div id='menu-code' class='menu-section'>
+						<span class='menu-title'>Actions</span>
+						<div contenteditable='true' class='menu-textarea' id='menu-textarea'></div>
+					</div>
+					<div id='menu-edit-collision-content' class='menu-section'>
+						<span class='menu-edit-collision-title'>On Update Collision</span>
+						<div contenteditable='true' class='menu-textarea' id='menu-edit-collision-textarea'></div>
+					</div>
+					<div id='menu-example-content' class='menu-section'>
+						<span class='menu-title'>Examples</span>
+						<select id='examples-select'>
+							<option disabled selected value> -- select an option -- </option>
+						</select>
+					</div>
+					<div id='menu-export-button' class='menu-button'>Export Pixels</div>
+					<div id='menu-import-button' class='menu-button'>Import Pixels</div>
+					<div id='menu-import-export-textearea-content' class='menu-section'>
+						<span class='menu-title' id='menu-import-export-title'>Copy and paste from this box to import and export pixels</span>
+						<textarea id='menu-import-export-textarea'></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script src='pixel.js' type='text/javascript'></script>
+<script src='ace-src-min/ace.js' type='text/javascript' charset='uft-8'></script>
+</html>
