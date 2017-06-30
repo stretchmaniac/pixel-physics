@@ -67,40 +67,38 @@ if(neighborSum([0],2) === 0){
     },
     statisticalMovement:{
         typeCode:[
-`var direction = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
-
+`direction = [Math.sign(Math.random()-.5),Math.sign(Math.random()-.5)];
 var n = getNeighbor(direction);
-
-if(n.type === null || n.type === 0){
-    move(direction);
+if(n === null || n.type === 0){
+    move(direction)
 }else{
-    move([0,0]);
-}`,`var pt1 = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
+    move([0,0])
+}`,`var pt1 = [Math.sign(Math.random()-.5),Math.sign(Math.random()-.5)];
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
+if(!pt1T || pt1T.type === 0){
     create([pt1],0);
     change(0);
-}`,'',`var pt1 = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
+}`,'',`var pt1 = [Math.sign(Math.random()-.5),Math.sign(Math.random()-.5)];
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
+if(!pt1T || pt1T.type === 0){
     create([pt1],0);
     change(1);
-}`,`var pt1 = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
+}`,`var pt1 = [Math.sign(Math.random()-.5),Math.sign(Math.random()-.5)];
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
+if(!pt1T || pt1T.type === 0){
     create([pt1],0);
     change(3);
-}`,`var pt1 = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
+}`,`var pt1 = [Math.sign(Math.random()-.5),Math.sign(Math.random()-.5)];
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
+if(!pt1T || pt1T.type === 0){
     create([pt1],0);
     change(4);
 }`],
@@ -501,10 +499,7 @@ function otherInitialization(){
         for(j = 0; j < example.pixs.length; j++){
             importPix(example.pixs[j]);
         }
-        paint(); 
-		
-		// close the dialog, so that the code window can be re-loaded on opening again
-		$(document).mousedown();
+        paint();
     })
     
     toggleSelection();
@@ -555,27 +550,13 @@ function stopAnimation(){
 function step(){
     var currentPixel;
     var changeLog = {};
-	var pixelClone = Object.assign({},pixels);
     
     var pixKeys = Object.keys(pixels);
-    for(var i = 0; i < pixKeys.length; i++){
-        currentPixel = pixels[pixKeys[i]];
-		var r = types[currentPixel.type].actionFunction(currentPixel, pixelClone);
-        var resultPix = r[0];
-		var resultChangeLog = r[1];
-		// add any keys generated in the last actionFunction to the entire changeLog
-		for(let k = 0; k < resultChangeLog.length; k++){
-			item = resultChangeLog[k];
-			const key = item[0];
-			const type = item[1];
-			const changerKey = item[2];
-			const pos = item[3];
-			if(!changeLog[key]){
-				changeLog[key] = [{type:type, changer:pixels[changerKey], pos:pos}]
-			}else{
-				changeLog[key].push({type:type, changer:pixels[changerKey], pos:pos});
-			}
-		}
+    for(var iterationVariable = 0; iterationVariable < pixKeys.length; iterationVariable++){
+        currentPixel = pixels[pixKeys[iterationVariable]];
+        var resultPix = types[currentPixel.type].actionFunction(currentPixel, changeLog);
+        pixels[pixKeys[iterationVariable]] = resultPix;
+        //save self items to changeLog!
     }
     
     //enact changes
@@ -628,144 +609,115 @@ function copyVec(v){
 
 function saveTypeSettings(){
     types[state.activeSettingsType].actionCode = editor.getValue();
-	codeString = `
-	return function(self, pixels){
-		var newChangeLog = [];
-		function globalGetNeighbors(n, pos,pixs){
-			var neighbors = [];
-			for(var j = -n; j <= n; j++){
-				neighbors[j]=[];
-				for(var m = -n; m <= n; m++){
-					var pix = findPix(plus([j,m],pos),pixs)
-					if(!pix){
-						neighbors[j][m] = {
-							type:null,
-							pos:plus([j,m],pos)
-						}
-					}else{
-						neighbors[j][m] = pixs[pix.pos]
-					}
-				}
-			}
-			return neighbors;
-		}
-		function move(localCoords){
-			removePixelToLog(self.pos);
-			addPixelToLog(plus(localCoords,self.pos),self.type)
-		}
-		function create(localCoords, type){
-			for(var q = 0; q < localCoords.length; q++){
-				addPixelToLog(plus(localCoords[q],self.pos), type)
-			}
-		}
-		function change(type){
-			addPixelToLog(self.pos,type)
-		}
-		function remove(){
-			removePixelToLog(self.pos)
-		}
-		function addPixelToLog(pos,type){
-			var key = pos[0]+','+pos[1]
-			// key, type, changerKey, pos props
-			newChangeLog.push([key,type,self.pos[0]+','+self.pos[1], pos])
-		}
-		function removePixelToLog(pos){
-			addPixelToLog(pos, null);
-		}
-		function getNeighbor(loc){
-			var result = findPix(plus(loc,self.pos),pixels);
-			if(!result){
-				return {type:null, pos:plus(loc,self.pos)};
-			}
-			return result;
-		}
-		function getNeighbors(n,pos){
-			if(!n){
-				n=1;
-			}
-			if(!pos){
-				pos=[0,0];
-			}
-			return globalGetNeighbors(n,plus(pos,self.pos), pixels)
-		}
-		function neighborSum(ts,n,pos){
-			if(!n){
-				n=1;
-			}
-			if(!pos){
-				pos=[0,0];
-			}
-			if(!ts){
-				ts = [];
-				for(var k = 0; k < types.length; k++){
-					ts.push(k);
-				}
-			}
-			var ns = getNeighbors(n,pos);
-			var sum = 0;
-			for(var j = -n; j <= n; j++){
-				for(var k = -n; k <= n; k++){
-					if(ts.indexOf(ns[j][k].type) !== -1 && (j != 0 || k != 0)){
-						sum++;
-					}
-				}
-			}
-			return sum;
-		}
-		function iterateNeighborhood(func, n){
-			var ns = getNeighbors(n);
-			for(var j = -n; j <= n; j++){
-				for(var k = -n; k <=n ;k++){
-					func(ns[j][k],[j,k]);
-				}
-			}
-		}
-		function findPix(pos,pixs){
-			return pixs[pos[0]+','+pos[1]];
-		}
-		function sub(a,b){
-			var result=[];
-			for(var i = 0; i < a.length; i++){
-				result.push(a[i]-b[i]);
-			}
-			return result;
-		}
-
-		function plus(a,b){
-			var result=[];
-			for(var i = 0; i < a.length; i++){
-				result.push(a[i]+b[i]);
-			}
-			return result;
-		}
-		
-		`+types[state.activeSettingsType].actionCode+`
-		return [self, newChangeLog];
-	}`;
-	(function(code, type){
-	caja.load(undefined, undefined, function(frame) {
-		frame.code("data:application/octet-stream," + encodeURIComponent(code),'text/javascript')
-			 .run(function (guestF) {
-					var f = frame.untame(guestF);
-					types[type].actionFunction = function(self, pixs){
-						return f(self,pixs);
-					}
-			 });
-	});
-	})(codeString, state.activeSettingsType);
+    try{
+        types[state.activeSettingsType].actionFunction = new Function('self','changeLog',`
+            function globalGetNeighbors(n, pos,pixs){
+                var neighbors = [];
+                for(var j = -n; j <= n; j++){
+                    neighbors[j]=[];
+                    for(var m = -n; m <= n; m++){
+                        var pix = findPix(plus([j,m],pos),pixs)
+                        if(!pix){
+                            neighbors[j][m] = {
+                                type:null,
+                                pos:plus([j,m],pos)
+                            }
+                        }else{
+                            neighbors[j][m] = pixs[pix.pos]
+                        }
+                    }
+                }
+                return neighbors;
+            }
+            function move(localCoords){
+                removePixelToLog(self.pos);
+                addPixelToLog(plus(localCoords,self.pos),self.type)
+            }
+            function create(localCoords, type){
+                for(var q = 0; q < localCoords.length; q++){
+                    addPixelToLog(plus(localCoords[q],self.pos), type)
+                }
+            }
+            function change(type){
+                addPixelToLog(self.pos,type)
+            }
+            function remove(){
+                removePixelToLog(self.pos)
+            }
+            function addPixelToLog(pos,type){
+                var key = pos[0]+','+pos[1]
+                if(!changeLog[key]){
+                    changeLog[key]=[{type:type,changer:self,pos:pos}]
+                }else{
+                    changeLog[key].push({type:type,changer:self,pos:pos});
+                }
+                
+            }
+            function removePixelToLog(pos){
+                addPixelToLog(pos, null);
+            }
+            function getNeighbor(loc){
+                var result = findPix(plus(loc,self.pos),pixels);
+                if(!result){
+                    return null;
+                }
+                return result;
+            }
+            function getNeighbors(n,pos){
+                if(!n){
+                    n=1;
+                }
+                if(!pos){
+                    pos=[0,0];
+                }
+                return globalGetNeighbors(n,plus(pos,self.pos), pixels)
+            }
+            function neighborSum(ts,n,pos){
+                if(!n){
+                    n=1;
+                }
+                if(!pos){
+                    pos=[0,0];
+                }
+                if(!ts){
+                    ts = [];
+                    for(var k = 0; k < types.length; k++){
+                        ts.push(k);
+                    }
+                }
+                var ns = getNeighbors(n,pos);
+                var sum = 0;
+                for(var j = -n; j <= n; j++){
+                    for(var k = -n; k <= n; k++){
+                        if(ts.indexOf(ns[j][k].type) !== -1 && (j != 0 || k != 0)){
+                            sum++;
+                        }
+                    }
+                }
+                return sum;
+            }
+            function iterateNeighborhood(func, n){
+                var ns = getNeighbors(n);
+                for(var j = -n; j <= n; j++){
+                    for(var k = -n; k <=n ;k++){
+                        func(ns[j][k],[j,k]);
+                    }
+                }
+            }
+            
+            `+types[state.activeSettingsType].actionCode+`
+         return self;`)
+    }catch(e){
+        console.log('evalation error')
+    }
 }
 
 function saveCollisionSettings(){
-	const code = 'return function(pos, changes){'+collisionEditor.getValue()+';\nreturn onUpdateCollision(pos, changes);}';
-	caja.load(undefined, undefined, function(frame) {
-		frame.code("data:application/octet-stream," + encodeURIComponent(code),'text/javascript')
-			 .run(function (guestF) {
-					var f = frame.untame(guestF);
-					state.collisionFunc = function(pos, changes){
-						return f(pos, changes);
-					}
-			 });
-	});
+    try{
+        state.collisionFunc = new Function('pos','changes',"'use strict';"+collisionEditor.getValue()+'\nreturn onUpdateCollision(pos, changes);');
+    }catch(e){
+        console.log('evaluation error');
+    }
 }
 
 function switchTypeSettings(){
