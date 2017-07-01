@@ -164,4 +164,42 @@ html,body{
 #menu-import-export-title{
     display:block;
 }
+.clickable{
+	padding:5px;
+}
+.clickable:hover{
+	background:rgba(0,0,0,.05);
+}
+code{
+	background:rgba(0,0,0,.075);
+	font-size:12px;
+}
+.reference-title code{
+	font-size: 20px;
+    font-weight: bold;
+}
+.reference-title{
+	font-size: 20px;
+    font-weight: bold;
+}
+.reference-title{
+	margin:5px;
+}
+
+.reference-description, .reference-arguments, .reference-return-object, .reference-example-title, .reference-example{
+	margin: 15px 20px 5px 20px;
+}
+.reference-row{
+	border: .5px solid rgba(0,0,0,.2);
+	margin:5px;
+	padding:5px;
+}
+.reference-example-title{
+	font-weight:bold;
+}
+code pre{
+	background-color:rgba(0,0,0,.075);
+	padding:5px;
+}
+
 

@@ -13,14 +13,14 @@ $(function(){
 var examples = {
     rule30:{
         typeCode:[
-        `var ns = getNeighbors();
-var s = ns[-1][-1].type+''+ns[0][-1].type+''+ns[1][-1].type;
+        `var n = getNeighbor;
+var s = n([-1,-1]).type+  '' + n([0,-1]).type + '' + n([1,-1]).type;
 s = s.replace(/null/g,'0');
-if(s == '100' || s=='001' || s=='010'||s=='011'){
-    change(1);
+if(s == '200' || s=='002' || s=='020' || s=='022'){
+    writeSelf(2);
 }
 
-create([[-1,1],[0,1],[1,1]],0);
+writeSeveral([[-1,1],[0,1],[1,1]], 1);
 
 remove();`],
         collisionCode:['    return changes[0].type;'],
@@ -33,21 +33,19 @@ remove();`],
 
     conwaysGameOfLife:{
         typeCode:[
-        `var s = neighborSum([0]);
+        `var s = getNeighborSum([1]);
 if(s < 2 || s > 3){
-    change(1);
+    writeSelf(2);
 }`,
-`var s = neighborSum([0]);
+`var s = getNeighborSum([1]);
 if(s === 3){
-    change(0);
-    var ns = getNeighbors();
-    iterateNeighborhood(function(pix,pos){
-        if(pix.type !== 0){
-            create([pos],1);
+    writeSelf(1);
+    mapNeighborhood(function(pix,pos){
+        if(pix.type !== 1){
+            write(pos,2);
         }
-    }, 1)
-}
-if(neighborSum([0],2) === 0){
+    });
+}else if(s === 0){
     remove();
 }`], 
         collisionCode:[`    var finalType;
@@ -55,8 +53,8 @@ if(neighborSum([0],2) === 0){
         if(changes[k].type !== null){
             finalType = changes[k].type;
         }
-        if(finalType === 0){
-            return 0;
+        if(finalType === 1){
+            return 1;
         }
     }
     return finalType;`],
@@ -71,7 +69,7 @@ if(neighborSum([0],2) === 0){
 
 var n = getNeighbor(direction);
 
-if(n.type === null || n.type === 0){
+if(n.type === null || n.type === 1){
     move(direction);
 }else{
     move([0,0]);
@@ -79,33 +77,33 @@ if(n.type === null || n.type === 0){
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
-    create([pt1],0);
-    change(0);
+if(pt1T.type === null || pt1T.type === 1){
+    write(pt1,1);
+    writeSelf(1);
 }`,'',`var pt1 = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
-    create([pt1],0);
-    change(1);
+if(pt1T.type === null || pt1T.type === 1){
+    write(pt1,1);
+    writeSelf(2);
 }`,`var pt1 = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
-    create([pt1],0);
-    change(3);
+if(pt1T.type === null || pt1T.type === 1){
+    write(pt1,1);
+    writeSelf(4);
 }`,`var pt1 = [(Math.random()-.5)<0?-1:1,(Math.random()-.5)<0?-1:1];
 
 var pt1T = getNeighbor(pt1);
 
-if(pt1T.type === null || pt1T.type === 0){
-    create([pt1],0);
-    change(4);
+if(pt1T.type === null || pt1T.type === 1){
+    write(pt1,1);
+    writeSelf(5);
 }`],
         collisionCode:[
-        `   var types = [];
+        `    var types = [];
     for(var k = 0; k < changes.length; k++){
         if(changes[k].type !== null){
             types.push(changes[k].type);
@@ -115,46 +113,16 @@ if(pt1T.type === null || pt1T.type === 0){
         return null;
     }
     if(types.length === 1){
-        return 0;
-    }
-    if(types.length === 2){
         return 1;
     }
+    if(types.length === 2){
+        return 2;
+    }
     //quite rare
-    return types.length;`],
+    return types.length+1`],
         title:"Statistical Movement",
         pixs:["18,5,2",
         "18,6,2","18,7,2","18,8,2","18,9,2","18,10,2","18,11,2","18,12,2","18,13,2","18,14,2","18,15,2","18,16,2","18,17,2","18,18,2","18,19,2","18,20,2","18,21,2","18,22,2","18,23,2","18,24,2","18,25,2","18,26,2","18,27,2","18,28,2","18,29,2","18,30,2","18,31,2","18,32,2","18,33,2","18,34,2","18,35,2","18,36,2","18,37,2","18,38,2","18,39,2","18,40,2","18,41,2","18,42,2","18,43,2","18,44,2","19,5,2","19,44,2","20,5,2","20,44,2","21,5,2","21,44,2","22,5,2","22,44,2","23,5,2","23,44,2","24,5,2","24,44,2","25,5,2","25,44,2","26,5,2","26,44,2","27,5,2","27,44,2","28,5,2","28,44,2","29,5,2","29,44,2","30,5,2","30,44,2","31,5,2","31,44,2","32,5,2","32,44,2","33,5,2","33,44,2","34,5,2","34,44,2","35,5,2","35,44,2","36,5,2","36,44,2","37,5,2","37,44,2","38,5,2","38,44,2","39,5,2","39,44,2","40,5,2","40,44,2","41,5,2","41,44,2","42,5,2","42,44,2","43,5,2","43,44,2","44,5,2","44,44,2","45,5,2","45,44,2","46,5,2","46,44,2","47,5,2","47,44,2","48,5,2","48,44,2","49,5,2","49,44,2","50,5,2","50,44,2","51,5,2","51,44,2","52,5,2","52,44,2","53,5,2","53,44,2","54,5,2","54,44,2","55,5,2","55,44,2","56,5,2","56,44,2","57,5,2","57,44,2","58,5,2","58,44,2","59,5,2","59,44,2","60,5,2","60,6,2","60,7,2","60,8,2","60,9,2","60,10,2","60,11,2","60,12,2","60,13,2","60,14,2","60,15,2","60,16,2","60,17,2","60,18,2","60,19,2","60,20,2","60,21,2","60,22,2","60,23,2","60,24,2","60,25,2","60,26,2","60,28,2","60,29,2","60,30,2","60,31,2","60,32,2","60,33,2","60,34,2","60,35,2","60,36,2","60,37,2","60,38,2","60,39,2","60,40,2","60,41,2","60,42,2","60,43,2","60,44,2","60,27,2","55,43,0","33,6,0","19,17,0","59,33,0","35,39,0","21,10,0","22,33,0","22,19,0","57,20,0","53,30,0","51,32,0","50,30,0","27,38,0","25,38,0","48,18,0","29,10,0","44,23,0","50,43,0","39,27,0","36,33,0","32,26,0","36,19,0","40,14,0","41,14,0","48,13,0","53,19,0","49,26,0","43,32,0","45,36,0","51,38,0","54,36,0","46,39,0","39,36,0","31,34,0","28,28,0","31,19,0","32,15,0","39,11,0","44,10,0","51,9,0","58,15,0","56,24,0","56,30,0","57,40,0","41,41,0","31,41,0","22,24,0","26,18,0"]
-    },
-    macroMovement:{
-        typeCode:[`
-        var n1 = getNeighbor([-1,0]);
-var n2 = getNeighbor([1,0]);
-
-var choices = [];
-if(n1 && n1.type === 2){
-    choices.push([-1,0]);
-}
-if(n2 && n2.type === 2){
-    choices.push([1,0])
-}
-
-if(choices.length === 0){
-    return;
-}
-
-var chosen = choices[Math.floor(Math.random() * choices.length)];
-change(2);
-create([chosen],0)`,``,``],
-        collisionCode:[`for(var k = 0; k < changes.length; k++){
-      if(changes[k] && changes[k].type !== null){
-          return changes[k].type;
-      }
-  }
-  return null;`],
-        title:"Macro Motion",
-        pixs:["17,13,2","18,13,0",
-        "19,13,2","20,13,2","21,13,2","22,13,2","23,13,2","24,13,2","25,13,2","26,13,2","27,13,2","28,13,2","29,13,2","30,13,2","31,13,2","32,13,2","33,13,2","34,13,2","35,13,2","36,13,2","37,13,2"]
     }
 }
 
@@ -265,12 +233,15 @@ function buttonEvents(){
         var newItem = $("<div class='control-item' id='type-"+itemIndex+"'></div>");
         newItem.css('background-color',''+colorSet[itemIndex]);
         types.push({color:colorSet[itemIndex],actionCode:'',actionFunction:function(){}});
+		
         $('.control-bar').append(newItem);
         
         
         removeTypeUnderlines();
         newItem.addClass('control-item-underlined');
         currentType = itemIndex;
+		
+		saveTypeSettings();
         
         newItem.click(function(e){
             removeTypeUnderlines();
@@ -425,6 +396,15 @@ function buttonEvents(){
         $('#menu-import-export-textarea').val('');
         paint();
     })
+
+	$('#reference-button').click(function(){
+		const wrapper = document.getElementById('reference-wrapper');
+		if(wrapper.style.display === 'none'){
+			wrapper.style.display = 'block';
+		}else{
+			wrapper.style.display = 'none';
+		}
+	});
 }
 
 function importPix(pixString){
@@ -433,6 +413,23 @@ function importPix(pixString){
 }
 
 function otherInitialization(){
+	ace.require('ace/ext/language_tools');
+	
+	// add some custom word-completion items
+	var wordCompleter = {
+		getCompletions: function(editor, session, pos, prefix, callback){
+			var words = ['getNeighbor', 'getNeighbors', 'move', 'create',
+						'change','remove','neighborSum','iterateNeighborhood', 'plus', 'sub'];
+			callback(null, words.map(function(word){
+				return {
+					caption: word,
+					value: word,
+					meta: 'pixel function'
+				}
+			}));
+		}
+	}
+	
     editor = ace.edit('menu-textarea');
     editor.setTheme("ace/theme/crimson_editor");
     editor.setShowPrintMargin(false);
@@ -440,6 +437,12 @@ function otherInitialization(){
     editor.getSession().on('change',function(){
         saveTypeSettings();
     })
+	editor.setOptions({
+		enableBasicAutocompletion: true,
+		enableSnippets: false,
+		enableLiveAutocompletion: true
+	});
+	editor.completers.push(wordCompleter);
     editor.$blockScrolling = Infinity
     
     collisionEditor = ace.edit('menu-edit-collision-textarea');
@@ -451,7 +454,12 @@ function otherInitialization(){
     })
     collisionEditor.$blockScrolling = Infinity
     
-    setCollisionText('  return null;')
+    setCollisionText(`  for(var k = 0; k < changes.length; k++){
+      if(changes[k].type !== null){
+          return changes[k].type;
+      }
+  }
+  return null;`)
     collisionEditor.navigateLineEnd();
     
     for(var k = 0; k < types.length; k++){
@@ -502,9 +510,6 @@ function otherInitialization(){
             importPix(example.pixs[j]);
         }
         paint(); 
-		
-		// close the dialog, so that the code window can be re-loaded on opening again
-		$(document).mousedown();
     })
     
     toggleSelection();
@@ -523,9 +528,12 @@ function clearTypeEditors(){
 
 function setCollisionText(text){
     collisionEditor.setValue(
-`//changes outlines the contradictory changes proposed for the position pos 
-//changes is an array of objects, each of which has a changer and type property
-//return an integer representing the final type of the pixel, with null being removal
+`// when a pixel experiences a contradiction, for example being removed by one pixel and added 
+//   by another, this function determines the outcome
+// pos - the position of the pixel in question
+// changes - an array of objects, each of the structure:
+//   {type: <integer>, changer: <pixel object>}
+// you must return the final type of the pixel, or null for removal
 function onUpdateCollision(pos, changes){
 `+text+`
 }`);
@@ -581,13 +589,24 @@ function step(){
     //enact changes
     var logKeys = Object.keys(changeLog);
     for(var k = 0; k < logKeys.length; k++){
-        var c = changeLog[logKeys[k]];
+        var c = changeLog[logKeys[k]].map(x => {
+			return {
+				pos:x.pos, 
+				type: (x.type === null ? null : x.type+1) ,
+				changer:{type:x.changer.type+1, pos: x.changer.pos}
+			}
+		});
         var resultType;
         if(c.length > 1){
             resultType = state.collisionFunc(c[0].pos,c);
+			if(resultType){
+				resultType--;
+			}
         }else{
-            resultType = c[0].type;
+            resultType = c[0].type !== null ? c[0].type - 1 : null;
         }
+		
+		console.log(resultType);
         
         if(resultType !== null){
             addPixel(c[0].pos, resultType);
@@ -630,39 +649,40 @@ function saveTypeSettings(){
     types[state.activeSettingsType].actionCode = editor.getValue();
 	codeString = `
 	return function(self, pixels){
+		self.type++;
 		var newChangeLog = [];
-		function globalGetNeighbors(n, pos,pixs){
-			var neighbors = [];
-			for(var j = -n; j <= n; j++){
-				neighbors[j]=[];
-				for(var m = -n; m <= n; m++){
-					var pix = findPix(plus([j,m],pos),pixs)
-					if(!pix){
-						neighbors[j][m] = {
-							type:null,
-							pos:plus([j,m],pos)
-						}
-					}else{
-						neighbors[j][m] = pixs[pix.pos]
-					}
-				}
-			}
-			return neighbors;
-		}
 		function move(localCoords){
 			removePixelToLog(self.pos);
-			addPixelToLog(plus(localCoords,self.pos),self.type)
+			addPixelToLog(plus(localCoords,self.pos),self.type - 1);
 		}
-		function create(localCoords, type){
+		function writeSeveral(localCoords, type){
 			for(var q = 0; q < localCoords.length; q++){
-				addPixelToLog(plus(localCoords[q],self.pos), type)
+				write(localCoords[q], type);
 			}
 		}
-		function change(type){
-			addPixelToLog(self.pos,type)
+		function write(pos, type){
+			if(!type){
+				addPixelToLog(plus(self.pos, pos), null)
+			}else{
+				addPixelToLog(plus(self.pos, pos),type - 1)
+			}
 		}
-		function remove(){
-			removePixelToLog(self.pos)
+		function writeSelf(type){
+			write([0,0], type);
+		}
+		function writeGlobal(pos, type){
+			if(!type){
+				addPixelToLog(pos, null);
+			}else{
+				addPixelToLog(pos, type - 1);
+			}
+		}
+		function remove(p){
+			if(p){
+				removePixelToLog(plus(p,self.pos));
+			}else{
+				removePixelToLog(self.pos);
+			}
 		}
 		function addPixelToLog(pos,type){
 			var key = pos[0]+','+pos[1]
@@ -677,46 +697,29 @@ function saveTypeSettings(){
 			if(!result){
 				return {type:null, pos:plus(loc,self.pos)};
 			}
-			return result;
+			return {type:result.type + 1, pos:result.pos};
 		}
-		function getNeighbors(n,pos){
+		function getNeighborSum(ts,n){
 			if(!n){
 				n=1;
 			}
-			if(!pos){
-				pos=[0,0];
-			}
-			return globalGetNeighbors(n,plus(pos,self.pos), pixels)
-		}
-		function neighborSum(ts,n,pos){
-			if(!n){
-				n=1;
-			}
-			if(!pos){
-				pos=[0,0];
-			}
-			if(!ts){
-				ts = [];
-				for(var k = 0; k < types.length; k++){
-					ts.push(k);
-				}
-			}
-			var ns = getNeighbors(n,pos);
 			var sum = 0;
 			for(var j = -n; j <= n; j++){
 				for(var k = -n; k <= n; k++){
-					if(ts.indexOf(ns[j][k].type) !== -1 && (j != 0 || k != 0)){
+					if(ts.indexOf(getNeighbor([j,k]).type) !== -1 && (j != 0 || k != 0)){
 						sum++;
 					}
 				}
 			}
 			return sum;
 		}
-		function iterateNeighborhood(func, n){
-			var ns = getNeighbors(n);
+		function mapNeighborhood(func, n){
+			if(!n){n=1}
 			for(var j = -n; j <= n; j++){
 				for(var k = -n; k <=n ;k++){
-					func(ns[j][k],[j,k]);
+					if(j !== 0 || k !== 0){
+						func(getNeighbor([j,k]),[j,k]);
+					}
 				}
 			}
 		}
@@ -740,12 +743,14 @@ function saveTypeSettings(){
 		}
 		
 		`+types[state.activeSettingsType].actionCode+`
+		self.type--;
 		return [self, newChangeLog];
 	}`;
 	(function(code, type){
 	caja.load(undefined, undefined, function(frame) {
 		frame.code("data:application/octet-stream," + encodeURIComponent(code),'text/javascript')
-			 .run(function (guestF) {
+				.api({log: console.log})
+				.run(function (guestF) {
 					var f = frame.untame(guestF);
 					types[type].actionFunction = function(self, pixs){
 						return f(self,pixs);
@@ -759,12 +764,13 @@ function saveCollisionSettings(){
 	const code = 'return function(pos, changes){'+collisionEditor.getValue()+';\nreturn onUpdateCollision(pos, changes);}';
 	caja.load(undefined, undefined, function(frame) {
 		frame.code("data:application/octet-stream," + encodeURIComponent(code),'text/javascript')
-			 .run(function (guestF) {
-					var f = frame.untame(guestF);
-					state.collisionFunc = function(pos, changes){
-						return f(pos, changes);
-					}
-			 });
+			.api({log: console.log})
+			.run(function (guestF) {
+				var f = frame.untame(guestF);
+				state.collisionFunc = function(pos, changes){
+					return f(pos, changes);
+				}
+			});
 	});
 }
 

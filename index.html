@@ -5,6 +5,10 @@
 <title>Pixel Physics</title>
 <link rel="stylesheet" type="text/css" href="styles.css">
 <script type="text/javascript" src="https://caja.appspot.com/caja.js"></script>
+<script src='ace-src-min/ace.js' type='text/javascript' charset='uft-8'></script>
+<script src="ace-src-min/ext-language_tools.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script src='pixel.js' type='text/javascript'></script>
 </head>
 
 <body>
@@ -45,6 +49,422 @@
 					<div id='menu-code' class='menu-section'>
 						<span class='menu-title'>Actions</span>
 						<div contenteditable='true' class='menu-textarea' id='menu-textarea'></div>
+						<div id='reference-button' class='clickable'>API Reference:</div>
+						<div id='reference-wrapper' style='display:none'>
+							<div class='reference-row'><!-- getNeighbor -->
+								<div class='reference-title'><code>getNeighbor(position)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>postion</code> &ndash; A two element array 
+											(<code>[x, y]</code>) representing which neighbor to retrieve.
+											Coordinates are relative to <code>self</code>, so 
+											<code>[1,0]</code> would refer to the neighbor immediately 
+											to the right of <code>self</code>, and <code>[0,1]</code> immediately 
+											below <code>self</code>.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Gets the pixel object for a specific neighbor, relative to self. Do not use 
+									a pixel object to set the type, use <code>write(...)</code> instead.
+								</div>
+								<div class='reference-return-object'>
+									Returns a pixel object (see "Pixel Object").
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>var left = getNeighbor([-1, 0]);
+var right = getNeighbor([1, 0]);
+var above = getNeighbor([0, -1]);
+var below = getNeighbor([0, 1]);
+
+log(left.type);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- getNeighborSum -->
+								<div class='reference-title'><code>getNeighborSum(types [, n])</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>types</code> &ndash; An array of integers denoting the types of pixels that count toward the sum.
+										</li>
+										<li>
+											<code>n</code> &ndash; The distance at which to assess neighbors.
+											<ul><li>If not specified, <code>n</code> defaults to 1.</li></ul>
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Counts the number of pixels in the extended <a href='https://en.wikipedia.org/wiki/Moore_neighborhood'>Moore 
+									neighborhood</a> of <code>self</code> that have a type listed in <code>types</code>, 
+									excluding <code>self</code>. <code>n</code> indicates the "extension" of the Moore 
+									neighborhood, where <code>n = 1</code> denotes the normal Moore neighborhood.  
+								</div>
+								<div class='reference-return-object'>
+									Returns an integer.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// I want to find the number of pixels of type 2 which 
+// touch self (diagonal counts)
+var count = getNeighborSum([2]);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- log -->
+								<div class='reference-title'><code>log(message)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>message</code> &ndash; An object to be logged.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Access to the <code>console.log(...)</code> function. Any <code>log(...)</code>
+									message will show up in the console in the developer tools.
+								</div>
+								<div class='reference-return-object'>
+									Returns undefined.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// I need to debug some stuff
+log(getNeighbor([1, 0]));
+
+// now right click on the top bar, click "inspect element," and 
+// navigate to the console. Your message should be there.</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- mapNeighborhood -->
+								<div class='reference-title'><code>mapNeighborhood(func [, n])</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>function</code> &ndash; A function to map across the neighborhood. This function is provided 
+											two arguments (in order):
+											<ul>
+												<li>A pixel object representing a pixel in the neighborhood</li>
+												<li>An array denoting the relative position of the neighbor in relation to 
+												self.</li>
+											</ul>
+										</li>
+										<li>
+											<code>n</code> &ndash; The distance at which to map to neighbors.
+											<ul><li>If not specified, <code>n</code> defaults to 1.</li></ul>
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Maps a function to the all the pixels in the extended 
+									<a href='https://en.wikipedia.org/wiki/Moore_neighborhood'>Moore 
+									neighborhood</a> of <code>self</code>, excluding <code>self</code>. <code>n</code> indicates the "extension" of the Moore 
+									neighborhood, where <code>n = 1</code> denotes the normal Moore neighborhood.  
+								</div>
+								<div class='reference-return-object'>
+									Returns undefined.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// remove all pixels within 2 of self
+mapNeighborhood(function(pix, pos){
+	remove(pos);
+}, 2);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- move -->
+								<div class='reference-title'><code>move(position)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>postion</code> &ndash; A two element array 
+											(<code>[x, y]</code>) representing where to move <code>self</code> to.
+											Coordinates are relative to <code>self</code>, so 
+											<code>[1,0]</code> would refer to the neighbor immediately 
+											to the right of <code>self</code>, and <code>[0,1]</code> immediately 
+											below <code>self</code>.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Moves <code>self</code> to the specified location. This is equivalent to 
+									<code>write(position, self.type)</code> followed by 
+									<code>writeSelf(null)</code>.
+								</div>
+								<div class='reference-return-object'>
+									Returns undefined.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// move upward on the screen
+move([0, -1]);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- pixel object -->
+								<div class='reference-title'>Pixel Object</div>
+								<div class='reference-arguments'>
+								</div>
+								<div class='reference-description'>
+									An object refering to a single pixel. Each pixel object has the following attributes:
+									<ul>
+										<li>
+											<code>pixel.pos</code> &ndash; an array denoting the <strong>global</strong> position of 
+											<code>pixel</code>. <strong>Use local coordinates (e.g. <code>[0, 1]</code>) in most cases</strong>.
+										</li>
+										<li>
+											<code>pixel.type</code> &ndash; an integer denoting the type of <code>pixel</code>, or 
+											<code>null</code> if the pixel does not exist.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// getNeighbor returns a pixel object
+// if there is no neighbor to the right, remove self
+if(getNeighbor([1, 0]).type === null){
+	writeSelf(0);
+}</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- plus -->
+								<div class='reference-title'><code>plus(a, b)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>a</code> &ndash; An <code>n</code> element array 
+											(<code>[x, y, z, ...]</code>).
+										</li>
+										<li>
+											<code>b</code> &ndash; Another <code>n</code> element array 
+											(<code>[x, y, z, ...]</code>).
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Returns the vector sum of the two arrays, or 
+									<code>[a[0] + b[0], a[1] + b[1], a[2] + b[2], ...]</code>.
+								</div>
+								<div class='reference-return-object'>
+									Returns an <code>n</code> element array.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>sum = plus([0, 1], [2, 3]);
+// sum is [2, 4]</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- remove -->
+								<div class='reference-title'><code>remove([position])</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>postion</code> &ndash; A two element array 
+											(<code>[x, y]</code>) representing which pixel to remove.
+											Coordinates are relative to <code>self</code>, so 
+											<code>[1,0]</code> would refer to the neighbor immediately 
+											to the right of <code>self</code>, and <code>[0,1]</code> immediately 
+											below <code>self</code>.
+											<ul><li><code>position</code> is <code>[0, 0]</code> by default</li></ul>
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Changes the type of the specified pixel to null, removing it. Calling 
+									<code>remove()</code> does not guarantee removal if in conflict 
+									with another command (perhaps a <code>change</code> command). Conflicts
+									are resolved in the <code>onUpdateCollision</code> function.
+								</div>
+								<div class='reference-return-object'>
+									Returns undefined.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// if the neighbor to the right has color 1
+if(getNeighbor([1,0]).type === 1){
+
+  // remove this pixel... 
+  remove();
+  
+  // and the pixel below it
+  remove([0,1]);
+}</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- self -->
+								<div class='reference-title'><code>self</code></div>
+								<div class='reference-arguments'>
+								</div>
+								<div class='reference-description'>
+									A pixel object referencing the pixel currently being modified. <code>self</code> 
+									has two attributes:
+									<ul>
+										<li>
+											<code>self.pos</code> &ndash; an array denoting the <strong>global</strong> position of the 
+											current pixel. <strong>Use local coordinates (e.g. <code>[0, 1]</code>) in most cases</strong>.
+										</li>
+										<li>
+											<code>self.type</code> &ndash; a positive integer denoting the type of the current pixel.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// turn the neighbor the same color as self
+write([1, 0], self.type);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- sub -->
+								<div class='reference-title'><code>sub(a, b)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>a</code> &ndash; An <code>n</code> element array 
+											(<code>[x, y, z, ...]</code>).
+										</li>
+										<li>
+											<code>b</code> &ndash; Another <code>n</code> element array 
+											(<code>[x, y, z, ...]</code>).
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Returns the vector subtraction of the two arrays, or 
+									<code>[a[0] - b[0], a[1] - b[1], a[2] - b[2], ...]</code>.
+								</div>
+								<div class='reference-return-object'>
+									Returns an <code>n</code> element array.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>diff = sub([0, 1], [2, 3]);
+// sum is [-2, -2]</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- write -->
+								<div class='reference-title'><code>write(position, type)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>postion</code> &ndash; A two element array 
+											(<code>[x, y]</code>) representing where to write to.
+											Coordinates are relative to <code>self</code>, so 
+											<code>[1,0]</code> would refer to the neighbor immediately 
+											to the right of <code>self</code>, and <code>[0,1]</code> immediately 
+											below <code>self</code>.
+										</li>
+										<li>
+											<code>type</code> &ndash; An integer greater than or equal 
+											to one which denotes the type (color) to write. This number 
+											corresponds to the keyboard shortcut which to access the color.
+											If <code>type</code> is null, the pixel is removed.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Changes the type of the specified pixel to <code>type</code>, overwriting 
+									any existing type or creating a new pixel. Calling <code>write(...)</code> 
+									does not gauruntee a change if it conflicts with another command. Conflicts 
+									are managed in the <code>onUpdateCollision</code> function.
+								</div>
+								<div class='reference-return-object'>
+									Returns undefined.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// same as remove()
+write([0,0], null);
+
+// change the next pixel over to type 2
+write([-1,0], 2);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- writeGlobal -->
+								<div class='reference-title'><code>writeGlobal(position, type)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>position</code> &ndash; An array <code>[x, y]</code> that corresponds 
+											to the <strong>global</strong> coordinates of the pixel to write to. 
+										</li>
+										<li>
+											<code>type</code> &ndash; An integer greater than or equal 
+											to one which denotes the type (color) to write to <code>self</code>. This number 
+											corresponds to the keyboard shortcut which to access the color. If 
+											<code>type</code> is null, <code>self</code> is removed.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									Writes a type to a pixel, much the same way as <code>write(...)</code>. The difference 
+									is that the position is specified in terms of absolute coordinates instead of local ones. 
+									<code>write(pos, type)</code> is the same as <code>writeGlobal(plus(self.pos, pos), type)</code>.
+								</div>
+								<div class='reference-return-object'>
+									Returns undefined.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// write to the pixel at (0,0), wherever that is
+writeGlobal([0, 0], 1);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- writeSelf -->
+								<div class='reference-title'><code>writeSelf(positions, type)</code></div>
+								<div class='reference-arguments'>
+									<ul>
+										<li>
+											<code>type</code> &ndash; An integer greater than or equal 
+											to one which denotes the type (color) to write to <code>self</code>. This number 
+											corresponds to the keyboard shortcut which to access the color. If 
+											<code>type</code> is null, <code>self</code> is removed.
+										</li>
+									</ul>
+								</div>
+								<div class='reference-description'>
+									A convenience function for <code>write([0, 0], type);</code>
+								</div>
+								<div class='reference-return-object'>
+									Returns undefined.
+								</div>
+								<div class='reference-example-title'>Example</div>
+								<div class='reference-example'>
+<code class='javascript'><pre>// same as remove()
+writeSelf(null);
+
+// change to type 2
+writeSelf(2);</pre></code>
+								</div>
+							</div>
+							<div class='reference-row'><!-- writeSeveral -->
+							<div class='reference-title'><code>writeSeveral(positions, type)</code></div>
+							<div class='reference-arguments'>
+								<ul>
+									<li>
+										<code>postions</code> &ndash; An array of positions 
+										(each of the form <code>[x, y]</code>, relative to <code>self</code>) denoting
+										the group of pixels to write to.
+									</li>
+									<li>
+										<code>type</code> &ndash; An integer greater than or equal 
+										to one which denotes the type (color) to write. This number 
+										corresponds to the keyboard shortcut which to access the color. 
+										If <code>type</code> is null, the pixels are removed.
+									</li>
+								</ul>
+							</div>
+							<div class='reference-description'>
+								A convenience function for performing several <code>write(...)</code> calls.
+							</div>
+							<div class='reference-return-object'>
+								Returns undefined.
+							</div>
+							<div class='reference-example-title'>Example</div>
+							<div class='reference-example'>
+<code class='javascript'><pre>// turn the next two pixels over to type 3
+write([[1,0], [2,0], [3,0]], 3);</pre></code>
+							</div>
+						</div>
+						</div>
 					</div>
 					<div id='menu-edit-collision-content' class='menu-section'>
 						<span class='menu-edit-collision-title'>On Update Collision</span>
@@ -67,7 +487,4 @@
 		</div>
 	</div>
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-<script src='pixel.js' type='text/javascript'></script>
-<script src='ace-src-min/ace.js' type='text/javascript' charset='uft-8'></script>
 </html>
