@@ -56,7 +56,7 @@
 								<div class='reference-arguments'>
 									<ul>
 										<li>
-											<code>postion</code> &ndash; A two element array 
+											<code>position</code> &ndash; A two element array 
 											(<code>[x, y]</code>) representing which neighbor to retrieve.
 											Coordinates are relative to <code>self</code>, so 
 											<code>[1,0]</code> would refer to the neighbor immediately 
@@ -177,7 +177,7 @@ mapNeighborhood(function(pix, pos){
 								<div class='reference-arguments'>
 									<ul>
 										<li>
-											<code>postion</code> &ndash; A two element array 
+											<code>position</code> &ndash; A two element array 
 											(<code>[x, y]</code>) representing where to move <code>self</code> to.
 											Coordinates are relative to <code>self</code>, so 
 											<code>[1,0]</code> would refer to the neighbor immediately 
@@ -205,7 +205,7 @@ move([0, -1]);</pre></code>
 								<div class='reference-arguments'>
 								</div>
 								<div class='reference-description'>
-									An object refering to a single pixel. Each pixel object has the following attributes:
+									An object referring to a single pixel. Each pixel object has the following attributes:
 									<ul>
 										<li>
 											<code>pixel.pos</code> &ndash; an array denoting the <strong>global</strong> position of 
@@ -258,7 +258,7 @@ if(getNeighbor([1, 0]).type === null){
 								<div class='reference-arguments'>
 									<ul>
 										<li>
-											<code>postion</code> &ndash; A two element array 
+											<code>position</code> &ndash; A two element array 
 											(<code>[x, y]</code>) representing which pixel to remove.
 											Coordinates are relative to <code>self</code>, so 
 											<code>[1,0]</code> would refer to the neighbor immediately 
@@ -345,7 +345,7 @@ write([1, 0], self.type);</pre></code>
 								<div class='reference-arguments'>
 									<ul>
 										<li>
-											<code>postion</code> &ndash; A two element array 
+											<code>position</code> &ndash; A two element array 
 											(<code>[x, y]</code>) representing where to write to.
 											Coordinates are relative to <code>self</code>, so 
 											<code>[1,0]</code> would refer to the neighbor immediately 
@@ -363,7 +363,7 @@ write([1, 0], self.type);</pre></code>
 								<div class='reference-description'>
 									Changes the type of the specified pixel to <code>type</code>, overwriting 
 									any existing type or creating a new pixel. Calling <code>write(...)</code> 
-									does not gauruntee a change if it conflicts with another command. Conflicts 
+									does not guarantee a change if it conflicts with another command. Conflicts 
 									are managed in the <code>onUpdateCollision</code> function.
 								</div>
 								<div class='reference-return-object'>
@@ -440,7 +440,7 @@ writeSelf(2);</pre></code>
 							<div class='reference-arguments'>
 								<ul>
 									<li>
-										<code>postions</code> &ndash; An array of positions 
+										<code>positions</code> &ndash; An array of positions 
 										(each of the form <code>[x, y]</code>, relative to <code>self</code>) denoting
 										the group of pixels to write to.
 									</li>

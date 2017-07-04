@@ -426,8 +426,8 @@ function otherInitialization(){
 	// add some custom word-completion items
 	var wordCompleter = {
 		getCompletions: function(editor, session, pos, prefix, callback){
-			var words = ['getNeighbor', 'getNeighbors', 'move', 'create',
-						'change','remove','neighborSum','iterateNeighborhood', 'plus', 'sub'];
+			var words = ['getNeighbor', 'getneighborSum', 'log', 'mapNeighborhood',
+						'move','plus','remove','self', 'sub', 'write','writeGlobal','writeSelf','writeSeveral'];
 			callback(null, words.map(function(word){
 				return {
 					caption: word,
